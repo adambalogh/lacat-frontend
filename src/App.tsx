@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BigNumber, ethers } from 'ethers';
+import { TransactionReceipt, TransactionResponse } from "@ethersproject/abstract-provider";
 import './App.css';
 import lacatDefinition from "./abi/lacat.json";
 import { DepositForm, DepositValues } from './components/DepositForm';
@@ -52,11 +53,13 @@ function App() {
   const makeDeposit = async (deposit: DepositValues) => {
     if (!ethEnv || !lacat) return;
 
-    const response = await lacat.connect(ethEnv.signer).deposit(deposit.unlockTimestamp.getTime() / 1000, deposit.monthlyWithdrawBasePoint, {
-      value: deposit.amountInEth
-    });
+    const response: TransactionResponse = await lacat.connect(ethEnv.signer).deposit(
+      BigNumber.from(deposit.unlockTimestamp.getTime() / 1000),
+      BigNumber.from(deposit.monthlyWithdrawBasePoint),
+      { value: deposit.amountInEth }
+    );
 
-    console.log("Sent transaction", response);
+    console.log("txn sent " + response);
   };
 
   useEffect(() => {
@@ -100,11 +103,18 @@ function App() {
   useEffect(() => {
     const fetchDeposits = async () => {
       if (ethEnv && lacat) {
-        const deposits = [];
+        const deposits: Deposit[] = [];
 
-        const numDeposits = await lacat.connect(ethEnv.signer).getNumDeposits();
+        const connectedLacat = lacat.connect(ethEnv.signer);
+        const numDeposits = await connectedLacat.getNumDeposits();
+        console.log("num deposits " + numDeposits);
+
         for (let i = 0; i < numDeposits; i++) {
-          const deposit = await lacat.connect(ethEnv.signer).getDepositStatus(i);
+          console.log("Getting deposit " + i);
+
+          const deposit = await connectedLacat.getDepositStatus(0);
+          console.log(deposit);
+
           deposits.push({
             amount: deposit[0],
             unlock: deposit[1],
