@@ -3,7 +3,16 @@ import { BigNumber, ethers } from 'ethers';
 import './App.css';
 import lacatDefinition from "./abi/lacat.json";
 import { DepositForm, DepositValues } from './components/DepositForm';
-import { env } from 'process';
+import {
+  Box,
+  Flex,
+  chakra,
+  SimpleGrid,
+  Stat,
+  StatLabel,
+  StatNumber,
+  useColorModeValue,
+} from '@chakra-ui/react'
 
 const lacatAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
@@ -111,17 +120,63 @@ function App() {
   }, [ethEnv, lacat]);
 
   return (
-    <div className="App">
+    <Box maxW="7xl" mx={'auto'} pt={5} px={{ base: 2, sm: 12, md: 17 }}>
 
-      <h1>{ "Lacat App" }</h1>
+      <chakra.h1
+        textAlign={'center'}
+        fontSize={'4xl'}
+        py={10}
+        fontWeight={'bold'}>
+          Lacat App
+      </chakra.h1>
 
-      <p>{ "Account: " +  ethEnv?.address }</p>
-      <p>{ "Balance: " + ethers.utils.formatEther(balance) + " ETH"}</p>
+      <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 5, lg: 8 }}>
+
+        <StatsCard 
+          title={'Account'}
+          stat={ ethEnv?.address || 'n/a' } />
+
+        <StatsCard 
+          title={'Balance'}
+          stat={ethers.utils.formatEther(balance) + " ETH"} />
+      
+      </SimpleGrid>
+
       <p>{ "Deposits: " + JSON.stringify(deposits) }</p>
 
       <h2>Make a deposit</h2>
       <DepositForm handler={makeDeposit} />
-    </div>
+
+
+    </Box>
+  );
+}
+
+interface StatsCardProps {
+  title: string;
+  stat: string
+}
+
+function StatsCard(props: StatsCardProps) {
+  return (
+    <Stat
+      px={{ base: 2, md: 4 }}
+      py={'5'}
+      shadow={'xl'}
+      border={'1px solid'}
+      borderColor={useColorModeValue('gray.800', 'gray.500')}
+      rounded={'lg'}>
+      <Flex justifyContent={'space-between'}>
+        <Box pl={{ base: 1, md: 4 }}>
+          <StatLabel fontWeight={'medium'} >
+            {props.title}
+          </StatLabel>
+          <StatNumber fontSize={'xl'} fontWeight={'medium'}>
+            {props.stat}
+          </StatNumber>
+        </Box>
+      </Flex>
+    </Stat>
   );
 }
 
