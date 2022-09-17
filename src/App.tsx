@@ -19,6 +19,7 @@ import {
   StatLabel,
   StatNumber,
   useColorModeValue,
+  Button,
 } from '@chakra-ui/react'
 import { TimeIcon } from '@chakra-ui/icons'
 
@@ -44,12 +45,42 @@ interface LacatState {
   totalLockedUp: ethers.BigNumber
 }
 
-interface Deposit {
-  id: number,
-  amount: ethers.BigNumber,
-  unlockDate: Date,
-  monthlyWithdraw: ethers.BigNumber,
-  lastWithdraw: Date | null
+class Deposit {
+  id: number;
+  amount: ethers.BigNumber;
+  unlockDate: Date;
+  monthlyWithdraw: ethers.BigNumber;
+  lastWithdraw: Date | null;
+
+  constructor(id: number, amount: BigNumber, unlockDate: Date, monthlyWithdraw: BigNumber, lastWithdraw: Date | null) {
+    this.id = id;
+    this.amount = amount;
+    this.unlockDate = unlockDate;
+    this.monthlyWithdraw = monthlyWithdraw;
+    this.lastWithdraw = lastWithdraw;
+  }
+
+  canBeUnlocked(): boolean {
+    return new Date() >= this.unlockDate;
+  }
+
+  canWithdrawMonthlyAllowance(): boolean {
+    if (!this.monthlyWithdrawSupported()) {
+      return false;
+    }
+    if (this.lastWithdraw == null) {
+      return true;
+    }
+
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setDate(new Date().getDate() - 30);
+
+    return this.lastWithdraw <= oneMonthAgo;
+  }
+
+  monthlyWithdrawSupported(): boolean {
+    return this.monthlyWithdraw.gt(0);
+  }
 }
 
 function App() {
@@ -67,6 +98,15 @@ function App() {
       BigNumber.from(deposit.monthlyWithdrawBasePoint),
       { value: deposit.amountInEth }
     );
+
+    console.log("txn sent " + response);
+  };
+
+  const withdrawMontlyAllowance = async (deposit: Deposit) => {
+    if (!ethEnv || !lacat) return;
+
+    const response: TransactionResponse = await lacat.connect(ethEnv.signer).withdrawMonthlyAllowance(
+      deposit.id);
 
     console.log("txn sent " + response);
   };
@@ -119,15 +159,14 @@ function App() {
         console.log("num deposits " + numDeposits);
 
         for (let i = 0; i < numDeposits; i++) {
-          const deposit = await connectedLacat.getDepositStatus(0);
+          const deposit = await connectedLacat.getDepositStatus(i);
 
-          deposits.push({
-            id: i,
-            amount: deposit[0],
-            unlockDate: new Date((deposit[1] as BigNumber).toNumber() * 1000),
-            monthlyWithdraw: deposit[2],
-            lastWithdraw: deposit[3] == 0 ? null : new Date((deposit[3] as BigNumber).toNumber() * 1000)
-          });
+          deposits.push(new Deposit(
+            i,
+            deposit[0],
+            new Date((deposit[1] as BigNumber).toNumber() * 1000),
+            deposit[2],
+            deposit[3] == 0 ? null : new Date((deposit[3] as BigNumber).toNumber() * 1000)));
         }
 
         const totalDeposit = deposits.map(d => d.amount).reduce((prev, current) => prev.add(current), BigNumber.from(0));
@@ -153,8 +192,8 @@ function App() {
         <AccordionButton>
           <Box flex='1' textAlign='left'>
             <TimeIcon mr={4} />
-            <b>{`${deposit.id + 1}: `}</b>
-            {`${ethers.utils.formatEther(deposit.amount)} ETH`}
+            {`Deposit ${deposit.id + 1}: `}
+            <b>{`${ethers.utils.formatEther(deposit.amount)} ETH`}</b>
           </Box>
           <AccordionIcon />
         </AccordionButton>
@@ -163,14 +202,22 @@ function App() {
         <SimpleGrid mt={4} columns={{ base: 1, md: 4 }} spacing={{ base: 5, lg: 8 }}>
           <StatsCard title="Remaining balance" stat={`${ethers.utils.formatEther(deposit.amount)} ETH`} />
           <StatsCard title="Unlock date" stat={deposit.unlockDate.toDateString()} />
-          <StatsCard title="Monthly withdrawal" 
-            stat={deposit.monthlyWithdraw.eq(BigNumber.from(0)) 
+          <StatsCard title="Monthly withdrawal allowance" 
+            stat={!deposit.monthlyWithdrawSupported()
               ? "Not supported" 
               : `${ethers.utils.formatEther(deposit.monthlyWithdraw)} ETH`} 
           />
           <StatsCard title="Last monthly withdrawal" 
             stat={deposit.lastWithdraw == null ? "Never" : deposit.lastWithdraw.toDateString()}
           />
+
+          <Button disabled={!deposit.canBeUnlocked()}>Withdraw full deposit</Button>
+          <Button 
+            disabled={!deposit.canWithdrawMonthlyAllowance()}
+            onClick={() => withdrawMontlyAllowance(deposit)}>
+            Withdraw monthly allowance
+          </Button>
+
         </SimpleGrid>
       </AccordionPanel>
     </AccordionItem>);
