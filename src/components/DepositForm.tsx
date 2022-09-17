@@ -1,6 +1,7 @@
 import { useForm, Resolver, Controller } from "react-hook-form";
 import DatePicker from "react-datepicker";
 import { 
+  Box,
   Button,
   ButtonProps,
   Flex,
@@ -52,12 +53,12 @@ export function DepositForm(props: Props) {
           control={control}
           name="unlockTimestamp"
           render={({ field: { onChange, onBlur, value } }) => (
-            <DatePicker
-              id="unlockTimestamp"
-              onChange={onChange}
-              onBlur={onBlur}
-              selected={value}
-            />
+              <DatePicker
+                id="unlockTimestamp"
+                onChange={onChange}
+                onBlur={onBlur}
+                selected={value}
+              />
           )}
         />
 

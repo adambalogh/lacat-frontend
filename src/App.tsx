@@ -39,6 +39,11 @@ interface EthEnv {
   address: string
 }
 
+interface LacatState {
+  deposits: Deposit[],
+  totalLockedUp: ethers.BigNumber
+}
+
 interface Deposit {
   id: number,
   amount: ethers.BigNumber,
@@ -52,7 +57,7 @@ function App() {
   const [ethEnv, setEthEnv] = useState<EthEnv | null>(null);
   const [balance, setBalance] = useState<ethers.BigNumber>(ethers.BigNumber.from(0));
   const [lacat, setLacat] = useState<ethers.Contract | null>(null);
-  const [deposits, setDeposits] = useState<Deposit[]>([]);
+  const [lacatState, setLacatState] = useState<LacatState>({ deposits: [], totalLockedUp: BigNumber.from(0) });
 
   const makeDeposit = async (deposit: DepositValues) => {
     if (!ethEnv || !lacat) return;
@@ -125,7 +130,12 @@ function App() {
           });
         }
 
-        setDeposits(deposits);
+        const totalDeposit = deposits.map(d => d.amount).reduce((prev, current) => prev.add(current), BigNumber.from(0));
+
+        setLacatState({
+          deposits: deposits,
+          totalLockedUp: totalDeposit,
+        });
       }
     }
 
@@ -137,7 +147,7 @@ function App() {
     return () => clearInterval(interval);
   }, [ethEnv, lacat]);
 
-  var depositAccordions = deposits.map(deposit => {
+  var depositAccordions = lacatState.deposits.map(deposit => {
     return (<AccordionItem key={deposit.id}>
       <h2>
         <AccordionButton>
@@ -180,12 +190,13 @@ function App() {
       <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 5, lg: 8 }}>
 
         <StatsCard 
-          title={'Account'}
-          stat={ ethEnv?.address || 'n/a' } />
+          title={'Account Balance'}
+          stat={ethers.utils.formatEther(balance) + " ETH"} />
 
         <StatsCard 
-          title={'Balance'}
-          stat={ethers.utils.formatEther(balance) + " ETH"} />
+          title={'Total Locked-up Balance'}
+          stat={ethers.utils.formatEther(lacatState.totalLockedUp) + " ETH"} />
+
       
       </SimpleGrid>
 
