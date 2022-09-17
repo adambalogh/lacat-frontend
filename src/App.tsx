@@ -180,7 +180,7 @@ function App() {
           Deposits
       </chakra.h2>
 
-      <Accordion>
+      <Accordion allowToggle={true}>
         { depositAccordions }
       </Accordion>
 
