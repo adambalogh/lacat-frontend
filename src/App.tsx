@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BigNumber, ethers } from 'ethers';
-import { TransactionReceipt, TransactionResponse } from "@ethersproject/abstract-provider";
+import { TransactionResponse } from "@ethersproject/abstract-provider";
 import './App.css';
 import lacatDefinition from "./abi/lacat.json";
 import { DepositForm, DepositValues } from './components/DepositForm';
@@ -11,6 +11,7 @@ import {
   AccordionPanel,
   AccordionIcon,
   Box,
+  Center,
   Flex,
   chakra,
   SimpleGrid,
@@ -19,6 +20,7 @@ import {
   StatNumber,
   useColorModeValue,
 } from '@chakra-ui/react'
+import { TimeIcon } from '@chakra-ui/icons'
 
 const lacatAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
@@ -40,7 +42,9 @@ interface EthEnv {
 interface Deposit {
   id: number,
   amount: ethers.BigNumber,
-  unlock: ethers.BigNumber,
+  unlockDate: Date,
+  monthlyWithdraw: ethers.BigNumber,
+  lastWithdraw: Date | null
 }
 
 function App() {
@@ -115,7 +119,9 @@ function App() {
           deposits.push({
             id: i,
             amount: deposit[0],
-            unlock: deposit[1],
+            unlockDate: new Date((deposit[1] as BigNumber).toNumber() * 1000),
+            monthlyWithdraw: deposit[2],
+            lastWithdraw: deposit[3] == 0 ? null : new Date((deposit[3] as BigNumber).toNumber() * 1000)
           });
         }
 
@@ -136,6 +142,7 @@ function App() {
       <h2>
         <AccordionButton>
           <Box flex='1' textAlign='left'>
+            <TimeIcon mr={4} />
             <b>{`${deposit.id + 1}: `}</b>
             {`${ethers.utils.formatEther(deposit.amount)} ETH`}
           </Box>
@@ -143,8 +150,18 @@ function App() {
         </AccordionButton>
       </h2>
       <AccordionPanel pb={4}>
-        <StatsCard title="Unlock date" stat={new Date(deposit.unlock.toNumber() * 1000).toDateString()} />
-        <StatsCard title="Remaining balance" stat={`${ethers.utils.formatEther(deposit.amount)} ETH`} />
+        <SimpleGrid mt={4} columns={{ base: 1, md: 4 }} spacing={{ base: 5, lg: 8 }}>
+          <StatsCard title="Remaining balance" stat={`${ethers.utils.formatEther(deposit.amount)} ETH`} />
+          <StatsCard title="Unlock date" stat={deposit.unlockDate.toDateString()} />
+          <StatsCard title="Monthly withdrawal" 
+            stat={deposit.monthlyWithdraw.eq(BigNumber.from(0)) 
+              ? "Not supported" 
+              : `${ethers.utils.formatEther(deposit.monthlyWithdraw)} ETH`} 
+          />
+          <StatsCard title="Last monthly withdrawal" 
+            stat={deposit.lastWithdraw == null ? "Never" : deposit.lastWithdraw.toDateString()}
+          />
+        </SimpleGrid>
       </AccordionPanel>
     </AccordionItem>);
   });
@@ -192,9 +209,18 @@ function App() {
           Make a deposit
       </chakra.h2>
 
-      <Flex justifyContent="center" alignItems="center">
-        <DepositForm handler={makeDeposit} />
-      </Flex>
+      <Center py={6}>
+        <Box
+          maxW={'320px'}
+          w={'full'}
+          bg={useColorModeValue('white', 'gray.900')}
+          boxShadow={'2xl'}
+          rounded={'lg'}
+          p={4}
+          textAlign={'center'}>
+          <DepositForm handler={makeDeposit} />
+        </Box>
+      </Center>
 
     </Box>
   );
