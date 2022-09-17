@@ -4,6 +4,11 @@ import './App.css';
 import lacatDefinition from "./abi/lacat.json";
 import { DepositForm, DepositValues } from './components/DepositForm';
 import {
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,
   Box,
   Flex,
   chakra,
@@ -119,8 +124,23 @@ function App() {
     return () => clearInterval(interval);
   }, [ethEnv, lacat]);
 
+  var depositAccordions = deposits.map(deposit => {
+    return (<AccordionItem>
+      <h2>
+        <AccordionButton>
+          <Box flex='1' textAlign='left'>
+            {ethers.utils.formatEther(deposit.amount)}
+          </Box>
+          <AccordionIcon />
+        </AccordionButton>
+      </h2>
+      <AccordionPanel pb={4}>
+      </AccordionPanel>
+    </AccordionItem>);
+  });
+
   return (
-    <Box maxW="7xl" mx={'auto'} pt={5} px={{ base: 2, sm: 12, md: 17 }}>
+    <Box maxW="7xl" mx={'auto'} pt={10} pb={10} px={{ base: 2, sm: 12, md: 17 }}>
 
       <chakra.h1
         textAlign={'center'}
@@ -142,11 +162,29 @@ function App() {
       
       </SimpleGrid>
 
-      <p>{ "Deposits: " + JSON.stringify(deposits) }</p>
+      <chakra.h2
+        textAlign={'center'}
+        fontSize={'2xl'}
+        py={10}
+        fontWeight={'bold'}>
+          Deposits
+      </chakra.h2>
 
-      <h2>Make a deposit</h2>
-      <DepositForm handler={makeDeposit} />
+      <Accordion>
+        { depositAccordions }
+      </Accordion>
 
+      <chakra.h2
+        textAlign={'center'}
+        fontSize={'2xl'}
+        py={10}
+        fontWeight={'bold'}>
+          Make a deposit
+      </chakra.h2>
+
+      <Flex justifyContent="center" alignItems="center">
+        <DepositForm handler={makeDeposit} />
+      </Flex>
 
     </Box>
   );
