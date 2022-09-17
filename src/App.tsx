@@ -38,9 +38,9 @@ interface EthEnv {
 }
 
 interface Deposit {
+  id: number,
   amount: ethers.BigNumber,
-  unlock: number,
-  isWithdrawn: boolean 
+  unlock: ethers.BigNumber,
 }
 
 function App() {
@@ -110,15 +110,12 @@ function App() {
         console.log("num deposits " + numDeposits);
 
         for (let i = 0; i < numDeposits; i++) {
-          console.log("Getting deposit " + i);
-
           const deposit = await connectedLacat.getDepositStatus(0);
-          console.log(deposit);
 
           deposits.push({
+            id: i,
             amount: deposit[0],
             unlock: deposit[1],
-            isWithdrawn: deposit[2]
           });
         }
 
@@ -135,16 +132,19 @@ function App() {
   }, [ethEnv, lacat]);
 
   var depositAccordions = deposits.map(deposit => {
-    return (<AccordionItem>
+    return (<AccordionItem key={deposit.id}>
       <h2>
         <AccordionButton>
           <Box flex='1' textAlign='left'>
-            {ethers.utils.formatEther(deposit.amount)}
+            <b>{`${deposit.id + 1}: `}</b>
+            {`${ethers.utils.formatEther(deposit.amount)} ETH`}
           </Box>
           <AccordionIcon />
         </AccordionButton>
       </h2>
       <AccordionPanel pb={4}>
+        <StatsCard title="Unlock date" stat={new Date(deposit.unlock.toNumber() * 1000).toDateString()} />
+        <StatsCard title="Remaining balance" stat={`${ethers.utils.formatEther(deposit.amount)} ETH`} />
       </AccordionPanel>
     </AccordionItem>);
   });
