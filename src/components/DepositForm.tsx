@@ -1,5 +1,6 @@
 import { useForm, Resolver, Controller } from "react-hook-form";
 import DatePicker from "react-datepicker";
+import React, { useState } from 'react';
 import { 
   Button,
   FormErrorMessage,
@@ -28,10 +29,17 @@ type Props = {
     handler: Handler
 }
 
+const baseFee = 35;
+const monthlyWithdrawFee = 15;
+
 export function DepositForm(props: Props) {
-  const { register, control, handleSubmit, formState: { isSubmitting, errors } } = useForm<DepositValues>();
+  const { register, control, handleSubmit, watch, formState: { isSubmitting, errors } } = useForm<DepositValues>();
 
   const onSubmit = handleSubmit(props.handler);
+  const watchFee = watch(['amountInEth', 'monthlyWithdrawBasePoint']); 
+
+  const feeBasisPoint = baseFee + (watchFee[1] == 0 ? 0 : monthlyWithdrawFee);
+  const fee = watchFee[0] * feeBasisPoint / 10000;
 
   return (
     <form onSubmit={onSubmit}>
@@ -41,6 +49,7 @@ export function DepositForm(props: Props) {
         <Input
           id='amountInEth'
           placeholder='0 ETH'
+          autoComplete="off"
           isInvalid={errors.amountInEth != null}
           {...register('amountInEth', {
             required: 'Amount is required',
@@ -53,7 +62,7 @@ export function DepositForm(props: Props) {
 
         { errors.amountInEth != null 
           ? (<FormErrorMessage>{errors.amountInEth?.message}</FormErrorMessage>)
-          : (<FormHelperText>Protocol Fee: 0.35%</FormHelperText>)
+          : (<FormHelperText>Protocol Fee: {fee} ETH</FormHelperText>)
         }
 
 
@@ -92,6 +101,7 @@ export function DepositForm(props: Props) {
         <Input
           id='monthlyWithdraw'
           defaultValue={0}
+          autoComplete="off"
           {...register('monthlyWithdrawBasePoint', {
             required: false,
             min: {
