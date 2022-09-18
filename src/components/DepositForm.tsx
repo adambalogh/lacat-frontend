@@ -54,8 +54,8 @@ export function DepositForm(props: Props) {
           {...register('amountInEth', {
             required: 'Amount is required',
             min: {
-              value: 0.01,
-              message: 'Amount must be greater than 0'
+              value: 0.1,
+              message: 'Amount must be greater than 0.1'
             }
           })}
         />
