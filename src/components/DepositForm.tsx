@@ -33,8 +33,6 @@ export function DepositForm(props: Props) {
 
   const onSubmit = handleSubmit(props.handler);
 
-  console.log(errors);
-  
   return (
     <form onSubmit={onSubmit}>
       <FormControl isInvalid={errors.amountInEth != null}>
@@ -87,16 +85,32 @@ export function DepositForm(props: Props) {
         
       </FormControl>
 
-      <FormControl>
-        <FormLabel htmlFor='monthlyWithdraw' mb={4} mt={4}>Monthly withdrawal in ETH (Optional)</FormLabel>
+      <FormControl isInvalid={errors.monthlyWithdrawBasePoint != null}>
+        <FormLabel htmlFor='monthlyWithdraw' mb={4} mt={4}>Monthly withdrawal (basis points)</FormLabel>
         <Input
           id='monthlyWithdraw'
           defaultValue={0}
-          {...register('monthlyWithdrawBasePoint')}
+          {...register('monthlyWithdrawBasePoint', {
+            required: false,
+            min: {
+              value: 0,
+              message: 'Cannot be less than 0'
+            },
+            max: {
+              value: 10000,
+              message: 'Cannot be greater than 10000'
+            }
+          })}
         />
-        <FormHelperText>
-          Maximum amount you can withdraw each month if you need it.
-        </FormHelperText>
+
+        { errors.monthlyWithdrawBasePoint != null 
+          ? (<FormErrorMessage>{errors.monthlyWithdrawBasePoint?.message}</FormErrorMessage>)
+          : (
+            <FormHelperText>
+              Monthly withdrawal rate in basis points of total deposit.
+            </FormHelperText>
+          )
+        }
       </FormControl>
 
       <Button 
