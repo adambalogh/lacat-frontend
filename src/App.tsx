@@ -30,10 +30,7 @@ async function getSigner() {
   const provider = new ethers.providers.Web3Provider((window as any).ethereum)
   await provider.send("eth_requestAccounts", []);
 
-  const signer = provider.getSigner();
-  console.log("Got signer");
-
-  return signer;
+  return provider.getSigner();
 }
 
 interface EthEnv {
@@ -130,10 +127,22 @@ function App() {
   const withdrawMontlyAllowance = async (deposit: Deposit) => {
     if (!ethEnv || !lacat) return;
 
-    const response: TransactionResponse = await lacat.connect(ethEnv.signer).withdrawMonthlyAllowance(
-      deposit.id);
+    const response: TransactionResponse = await lacat.connect(ethEnv.signer)
+      .withdrawMonthlyAllowance(deposit.id);
 
-    console.log("txn sent " + response);
+    response.wait(1).then(() => toast({
+      title: 'Monthly withdrawal successful',
+      status: 'success',
+      duration: 5000,
+      isClosable: true,
+    }));
+
+    toast({
+      title: 'Transaction submitted for monthly withdrawal',
+      status: 'success',
+      duration: 5000,
+      isClosable: true,
+    });
   };
 
   useEffect(() => {
@@ -181,7 +190,6 @@ function App() {
 
         const connectedLacat = lacat.connect(ethEnv.signer);
         const numDeposits = await connectedLacat.getNumDeposits();
-        console.log("num deposits " + numDeposits);
 
         for (let i = 0; i < numDeposits; i++) {
           const deposit = await connectedLacat.getDepositStatus(i);
