@@ -51,9 +51,11 @@ export function DepositForm(props: Props) {
           })}
         />
 
-        { errors.amountInEth != null && 
-          <FormErrorMessage>{errors.amountInEth?.message}</FormErrorMessage>
+        { errors.amountInEth != null 
+          ? (<FormErrorMessage>{errors.amountInEth?.message}</FormErrorMessage>)
+          : (<FormHelperText>Protocol Fee: 0.35%</FormHelperText>)
         }
+
 
       </FormControl>
 
