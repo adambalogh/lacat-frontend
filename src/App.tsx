@@ -96,7 +96,7 @@ function App() {
     const response: TransactionResponse = await lacat.connect(ethEnv.signer).deposit(
       BigNumber.from(deposit.unlockTimestamp.getTime() / 1000),
       BigNumber.from(deposit.monthlyWithdrawBasePoint),
-      { value: deposit.amountInEth }
+      { value: ethers.utils.parseUnits(deposit.amountInEth.toString(), "ether") }
     );
 
     console.log("txn sent " + response);

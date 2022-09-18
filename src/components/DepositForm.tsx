@@ -1,11 +1,9 @@
 import { useForm, Resolver, Controller } from "react-hook-form";
 import DatePicker from "react-datepicker";
 import { 
-  Box,
   Button,
-  ButtonProps,
-  Flex,
   FormErrorMessage,
+  FormHelperText,
   FormLabel,
   FormControl,
   Input
@@ -31,44 +29,74 @@ type Props = {
 }
 
 export function DepositForm(props: Props) {
-  const { register, control, handleSubmit, formState: { isSubmitting, errors } } = useForm<DepositValues>({ resolver });
+  const { register, control, handleSubmit, formState: { isSubmitting, errors } } = useForm<DepositValues>();
 
   const onSubmit = handleSubmit(props.handler);
+
+  console.log(errors);
   
   return (
     <form onSubmit={onSubmit}>
-      <FormControl>
+      <FormControl isInvalid={errors.amountInEth != null}>
 
-        <FormLabel htmlFor='amountInEth'>Amount in ETH</FormLabel>
+        <FormLabel htmlFor='amountInEth' mb={4}>Amount in ETH</FormLabel>
         <Input
           id='amountInEth'
           placeholder='0 ETH'
+          isInvalid={errors.amountInEth != null}
           {...register('amountInEth', {
-            required: 'This is required',
+            required: 'Amount is required',
+            min: {
+              value: 0.00001,
+              message: 'Amount must be greater than 0'
+            }
           })}
         />
 
-        <FormLabel htmlFor='unlockTimestamp'>Unlock date</FormLabel>
+        { errors.amountInEth != null && 
+          <FormErrorMessage>{errors.amountInEth?.message}</FormErrorMessage>
+        }
+
+      </FormControl>
+
+      <FormControl isInvalid={errors.unlockTimestamp != null}>
+        <FormLabel htmlFor='unlockTimestamp' mb={4} mt={4}>Unlock date</FormLabel>
         <Controller
           control={control}
           name="unlockTimestamp"
+          rules={{
+            required: 'Unlock date must be set'
+          }}
           render={({ field: { onChange, onBlur, value } }) => (
-              <DatePicker
-                id="unlockTimestamp"
-                onChange={onChange}
-                onBlur={onBlur}
-                selected={value}
-              />
+            <DatePicker
+              className="chakra-input css-1ohbhgu"
+              id="unlockTimestamp"
+              onChange={onChange}
+              onBlur={onBlur}
+              selected={value}
+              autoComplete="off"
+              placeholderText={new Date().toLocaleDateString()}
+            />
           )}
         />
 
-        <FormLabel htmlFor='monthlyWithdraw'>Monthly withdrawal</FormLabel>
+        { errors.unlockTimestamp != null 
+          ? (<FormErrorMessage>{errors.unlockTimestamp?.message}</FormErrorMessage>)
+          : (<FormHelperText>When do you want it to be unlocked?</FormHelperText>)
+        }
+        
+      </FormControl>
+
+      <FormControl>
+        <FormLabel htmlFor='monthlyWithdraw' mb={4} mt={4}>Monthly withdrawal in ETH (Optional)</FormLabel>
         <Input
           id='monthlyWithdraw'
-          placeholder='0'
+          defaultValue={0}
           {...register('monthlyWithdrawBasePoint')}
         />
-
+        <FormHelperText>
+          Maximum amount you can withdraw each month if you need it.
+        </FormHelperText>
       </FormControl>
 
       <Button 
