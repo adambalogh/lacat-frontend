@@ -12,6 +12,7 @@ import {
   AccordionIcon,
   Box,
   Center,
+  Container,
   Flex,
   chakra,
   SimpleGrid,
@@ -20,7 +21,8 @@ import {
   StatNumber,
   useColorModeValue,
   Button,
-  useToast
+  useToast,
+  Text
 } from '@chakra-ui/react'
 import { TimeIcon } from '@chakra-ui/icons'
 
@@ -257,63 +259,67 @@ function App() {
   });
 
   return (
-    <Box maxW="7xl" mx={'auto'} pt={10} pb={10} px={{ base: 2, sm: 12, md: 17 }}>
+    <div>
+      <Box maxW="7xl" mx={'auto'} pt={10} pb={10} px={{ base: 2, sm: 12, md: 17 }}>
 
-      <chakra.h1
-        textAlign={'center'}
-        fontSize={'4xl'}
-        py={10}
-        fontWeight={'bold'}>
-          Lacat App v1.0.0
-      </chakra.h1>
+        <chakra.h1
+          textAlign={'center'}
+          fontSize={'4xl'}
+          py={10}
+          fontWeight={'bold'}>
+            Lacat App v1.0.0
+        </chakra.h1>
 
-      <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 5, lg: 8 }}>
+        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 5, lg: 8 }}>
 
-        <StatsCard 
-          title={'Account Balance'}
-          stat={ethers.utils.formatEther(balance) + " ETH"} />
+          <StatsCard 
+            title={'Account Balance'}
+            stat={ethers.utils.formatEther(balance) + " ETH"} />
 
-        <StatsCard 
-          title={'Total Locked-up Balance'}
-          stat={ethers.utils.formatEther(lacatState.totalLockedUp) + " ETH"} />
+          <StatsCard 
+            title={'Total Locked-up Balance'}
+            stat={ethers.utils.formatEther(lacatState.totalLockedUp) + " ETH"} />
 
-      
-      </SimpleGrid>
+        
+        </SimpleGrid>
 
-      <chakra.h2
-        textAlign={'center'}
-        fontSize={'2xl'}
-        py={10}
-        fontWeight={'bold'}>
-          Deposits
-      </chakra.h2>
+        <chakra.h2
+          textAlign={'center'}
+          fontSize={'2xl'}
+          py={10}
+          fontWeight={'bold'}>
+            Deposits
+        </chakra.h2>
 
-      <Accordion allowToggle={true}>
-        { depositAccordions }
-      </Accordion>
+        <Accordion allowToggle={true}>
+          { depositAccordions }
+        </Accordion>
 
-      <chakra.h2
-        textAlign={'center'}
-        fontSize={'2xl'}
-        py={10}
-        fontWeight={'bold'}>
-          Make a deposit
-      </chakra.h2>
+        <chakra.h2
+          textAlign={'center'}
+          fontSize={'2xl'}
+          py={10}
+          fontWeight={'bold'}>
+            Make a deposit
+        </chakra.h2>
 
-      <Center>
-        <Box
-          maxW={'320px'}
-          w={'full'}
-          bg={useColorModeValue('white', 'gray.900')}
-          boxShadow={'2xl'}
-          rounded={'lg'}
-          p={4}
-          textAlign={'center'}>
-          <DepositForm handler={makeDeposit} />
-        </Box>
-      </Center>
+        <Center>
+          <Box
+            maxW={'320px'}
+            w={'full'}
+            bg={useColorModeValue('white', 'gray.900')}
+            boxShadow={'2xl'}
+            rounded={'lg'}
+            p={4}
+            textAlign={'center'}>
+            <DepositForm handler={makeDeposit} />
+          </Box>
+        </Center>
 
-    </Box>
+      </Box>
+
+      <Footer />
+    </div>
   );
 }
 
@@ -342,6 +348,20 @@ function StatsCard(props: StatsCardProps) {
         </Box>
       </Flex>
     </Stat>
+  );
+}
+
+function Footer() {
+  return (
+    <Box
+      bg={useColorModeValue('gray.50', 'gray.900')}
+      color={useColorModeValue('gray.700', 'gray.200')}>
+      <Container
+        maxW={'6xl'}
+        py={4} >
+        <Text>© 2022 Lacat. All rights reserved. Made by Adam Balogh</Text>
+      </Container>
+    </Box>
   );
 }
 
