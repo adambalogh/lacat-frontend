@@ -20,6 +20,7 @@ import {
   StatNumber,
   useColorModeValue,
   Button,
+  useToast
 } from '@chakra-ui/react'
 import { TimeIcon } from '@chakra-ui/icons'
 
@@ -89,6 +90,7 @@ function App() {
   const [balance, setBalance] = useState<ethers.BigNumber>(ethers.BigNumber.from(0));
   const [lacat, setLacat] = useState<ethers.Contract | null>(null);
   const [lacatState, setLacatState] = useState<LacatState>({ deposits: [], totalLockedUp: BigNumber.from(0) });
+  const toast = useToast();
 
   const makeDeposit = async (deposit: DepositValues) => {
     if (!ethEnv || !lacat) return;
@@ -99,7 +101,19 @@ function App() {
       { value: ethers.utils.parseUnits(deposit.amountInEth.toString(), "ether") }
     );
 
-    console.log("txn sent " + response);
+    response.wait(1).then(() => toast({
+      title: 'Deposit successful',
+      status: 'success',
+      duration: 5000,
+      isClosable: true,
+    }));
+
+    toast({
+      title: 'Transaction submitted for deposit',
+      status: 'success',
+      duration: 5000,
+      isClosable: true,
+    });
   };
 
   const withdrawMontlyAllowance = async (deposit: Deposit) => {
