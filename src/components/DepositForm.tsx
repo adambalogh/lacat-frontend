@@ -54,7 +54,7 @@ export function DepositForm(props: Props) {
           {...register('amountInEth', {
             required: 'Amount is required',
             min: {
-              value: 0.00001,
+              value: 0.01,
               message: 'Amount must be greater than 0'
             }
           })}
@@ -64,7 +64,6 @@ export function DepositForm(props: Props) {
           ? (<FormErrorMessage>{errors.amountInEth?.message}</FormErrorMessage>)
           : (<FormHelperText>Protocol Fee: {fee} ETH</FormHelperText>)
         }
-
 
       </FormControl>
 
