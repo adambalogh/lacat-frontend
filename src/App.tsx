@@ -95,11 +95,22 @@ function App() {
   const makeDeposit = async (deposit: DepositValues) => {
     if (!ethEnv || !lacat) return;
 
-    const response: TransactionResponse = await lacat.connect(ethEnv.signer).deposit(
-      BigNumber.from(deposit.unlockTimestamp.getTime() / 1000),
-      BigNumber.from(deposit.monthlyWithdrawBasePoint),
-      { value: ethers.utils.parseUnits(deposit.amountInEth.toString(), "ether") }
-    );
+    let response: TransactionResponse;
+    try {
+      response = await lacat.connect(ethEnv.signer).deposit(
+        BigNumber.from(deposit.unlockTimestamp.getTime() / 1000),
+        BigNumber.from(deposit.monthlyWithdrawBasePoint),
+        { value: ethers.utils.parseUnits(deposit.amountInEth.toString(), "ether") }
+      );
+    } catch (err) {
+      toast({
+        title: 'Transaction cancelled',
+        status: 'warning',
+        duration: 5000,
+        isClosable: true,
+      });
+      throw err;
+    }
 
     response.wait(1).then(() => toast({
       title: 'Deposit successful',
