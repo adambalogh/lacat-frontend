@@ -264,7 +264,7 @@ function App() {
         fontSize={'4xl'}
         py={10}
         fontWeight={'bold'}>
-          Lacat App
+          Lacat App v1.0.0
       </chakra.h1>
 
       <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 5, lg: 8 }}>
@@ -300,7 +300,7 @@ function App() {
           Make a deposit
       </chakra.h2>
 
-      <Center py={6}>
+      <Center>
         <Box
           maxW={'320px'}
           w={'full'}
