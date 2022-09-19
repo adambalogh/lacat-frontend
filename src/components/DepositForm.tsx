@@ -122,7 +122,7 @@ export function DepositForm(props: Props) {
               Monthly withdrawal in basis points of deposit.
               <br/>
               <br/>
-              Equals to { monthlyWithdrawal } ETH
+              Equals to { monthlyWithdrawal } ETH per month.
             </FormHelperText>
           )
         }
