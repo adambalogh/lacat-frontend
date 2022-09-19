@@ -22,6 +22,15 @@ import {
   useColorModeValue,
   Button,
   useToast,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Spacer,
+  useDisclosure,
 } from '@chakra-ui/react'
 import { TimeIcon, UnlockIcon, CheckIcon } from '@chakra-ui/icons'
 
@@ -297,13 +306,25 @@ function App() {
     <div>
       <Box maxW="7xl" mx={'auto'} pb={10} px={{ base: 2, sm: 12, md: 17 }}>
 
-        <chakra.h1
-          textAlign={'center'}
-          fontSize={'4xl'}
-          py={10}
-          fontWeight={'bold'}>
-            Lacat App v1.0.0
-        </chakra.h1>
+        <Flex>
+          <Box>
+            <chakra.h1
+              textAlign={'center'}
+              fontSize={'4xl'}
+              py={10}
+              fontWeight={'bold'}>
+                Lacat v1.0.0
+            </chakra.h1>
+          </Box>
+
+          <Spacer />
+
+          <Center>
+            <HelpModal />
+          </Center>
+
+        </Flex>
+
 
         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 5, lg: 8 }}>
 
@@ -384,6 +405,50 @@ function StatsCard(props: StatsCardProps) {
       </Flex>
     </Stat>
   );
+}
+
+function HelpModal() {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  
+  return (
+    <>
+      <Button onClick={onOpen} variant='ghost'>How it works?</Button>
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Lacat Smart Wallet</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <p>
+              Lacat is the best way to HODL your crypto. It allows you to lock up your funds for a specified amount of time
+              so you don't have to worry about panic-selling or losing your funds due to a hack or accidentally sending it to someone.
+            </p>
+            <br/>
+            <p>
+              Just make a deposit and once the time expires, you can withdraw it back to your personal wallet. Your crypto always remains
+              yours, we just hold it for you temporarily. There is no way for us or anyone else to withdraw your funds so it is totally safe.
+            </p>
+            <br/>
+            <p>
+              Optionally, you can also allow monthly withdrawals in case you need to access your funds due to unforseen circumatances.
+            </p>
+            <br/>
+            <p>
+              Depositing costs 0.035% of your funds and enabling monthly withdrawals costs 0.015%. Once your funds are locked in, it is not
+              possible to enable/disable monthly withdrawal or change the expiration date.
+            </p>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme='blue' mr={3} onClick={onClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
+  )
 }
 
 export default App;
