@@ -23,7 +23,7 @@ import {
   Button,
   useToast,
 } from '@chakra-ui/react'
-import { TimeIcon } from '@chakra-ui/icons'
+import { TimeIcon, UnlockIcon } from '@chakra-ui/icons'
 
 const lacatAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
@@ -119,6 +119,27 @@ function App() {
 
     toast({
       title: 'Transaction submitted for deposit',
+      status: 'success',
+      duration: 5000,
+      isClosable: true,
+    });
+  };
+
+  const withdrawFullDeposit = async (deposit: Deposit) => {
+    if (!ethEnv || !lacat) return;
+
+    const response: TransactionResponse = await lacat.connect(ethEnv.signer)
+      .withdraw(deposit.id);
+
+    response.wait(1).then(() => toast({
+      title: 'Deposit withdrawal successful',
+      status: 'success',
+      duration: 5000,
+      isClosable: true,
+    }));
+
+    toast({
+      title: 'Transaction submitted for deposit withdrawal',
       status: 'success',
       duration: 5000,
       isClosable: true,
@@ -225,7 +246,11 @@ function App() {
       <h2>
         <AccordionButton>
           <Box flex='1' textAlign='left'>
-            <TimeIcon mr={4} />
+            { deposit.canBeUnlocked()
+              ? <UnlockIcon mr={4} />
+              : <TimeIcon mr={4} />
+            }
+
             {`Deposit ${deposit.id + 1}: `}
             <b>{`${ethers.utils.formatEther(deposit.amount)} ETH`}</b>
           </Box>
@@ -245,7 +270,11 @@ function App() {
             stat={deposit.lastWithdraw == null ? "Never" : deposit.lastWithdraw.toDateString()}
           />
 
-          <Button disabled={!deposit.canBeUnlocked()}>Withdraw full deposit</Button>
+          <Button 
+            disabled={!deposit.canBeUnlocked()}
+            onClick={() => withdrawFullDeposit(deposit)}>
+            Withdraw full deposit
+          </Button>
           <Button 
             disabled={!deposit.canWithdrawMonthlyAllowance()}
             onClick={() => withdrawMontlyAllowance(deposit)}>
