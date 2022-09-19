@@ -4,6 +4,7 @@ import { TransactionResponse } from "@ethersproject/abstract-provider";
 import './App.css';
 import lacatDefinition from "./abi/lacat.json";
 import { DepositForm, DepositValues } from './components/DepositForm';
+import { Footer } from './components/Footer';
 import {
   Accordion,
   AccordionItem,
@@ -12,7 +13,6 @@ import {
   AccordionIcon,
   Box,
   Center,
-  Container,
   Flex,
   chakra,
   SimpleGrid,
@@ -22,7 +22,6 @@ import {
   useColorModeValue,
   Button,
   useToast,
-  Text
 } from '@chakra-ui/react'
 import { TimeIcon } from '@chakra-ui/icons'
 
@@ -260,7 +259,7 @@ function App() {
 
   return (
     <div>
-      <Box maxW="7xl" mx={'auto'} pt={10} pb={10} px={{ base: 2, sm: 12, md: 17 }}>
+      <Box maxW="7xl" mx={'auto'} pb={10} px={{ base: 2, sm: 12, md: 17 }}>
 
         <chakra.h1
           textAlign={'center'}
@@ -348,20 +347,6 @@ function StatsCard(props: StatsCardProps) {
         </Box>
       </Flex>
     </Stat>
-  );
-}
-
-function Footer() {
-  return (
-    <Box
-      bg={useColorModeValue('gray.50', 'gray.900')}
-      color={useColorModeValue('gray.700', 'gray.200')}>
-      <Container
-        maxW={'6xl'}
-        py={4} >
-        <Text>© 2022 Lacat. All rights reserved. Made by Adam Balogh</Text>
-      </Container>
-    </Box>
   );
 }
 
