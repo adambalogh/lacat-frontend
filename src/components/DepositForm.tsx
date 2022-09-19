@@ -40,6 +40,8 @@ export function DepositForm(props: Props) {
   const feeBasisPoint = baseFee + (watchFee[1] == 0 ? 0 : monthlyWithdrawFee);
   const fee = watchFee[0] * feeBasisPoint / 10000;
 
+  const monthlyWithdrawal = watchFee[0] * watchFee[1] / 10000;
+
   return (
     <form onSubmit={onSubmit}>
       <FormControl isInvalid={errors.amountInEth != null}>
@@ -117,7 +119,10 @@ export function DepositForm(props: Props) {
           ? (<FormErrorMessage>{errors.monthlyWithdrawBasePoint?.message}</FormErrorMessage>)
           : (
             <FormHelperText>
-              Monthly withdrawal rate in basis points of total deposit.
+              Monthly withdrawal in basis points of deposit.
+              <br/>
+              <br/>
+              Equals to { monthlyWithdrawal } ETH
             </FormHelperText>
           )
         }
