@@ -34,7 +34,7 @@ import {
 } from '@chakra-ui/react'
 import { TimeIcon, UnlockIcon, CheckIcon } from '@chakra-ui/icons'
 
-const lacatAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+const lacatAddress = "0xf6dE9D88947DA04Aad964A5129f2535E3a57FB1F";
 
 async function getSigner() {
   const provider = new ethers.providers.Web3Provider((window as any).ethereum)
