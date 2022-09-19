@@ -23,7 +23,7 @@ import {
   Button,
   useToast,
 } from '@chakra-ui/react'
-import { TimeIcon, UnlockIcon } from '@chakra-ui/icons'
+import { TimeIcon, UnlockIcon, CheckIcon } from '@chakra-ui/icons'
 
 const lacatAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
@@ -60,7 +60,11 @@ class Deposit {
   }
 
   canBeUnlocked(): boolean {
-    return new Date() >= this.unlockDate;
+    return !this.isAlreadyWithdrawn() && new Date() >= this.unlockDate;
+  }
+
+  isAlreadyWithdrawn(): boolean {
+    return this.amount.eq(0);
   }
 
   canWithdrawMonthlyAllowance(): boolean {
@@ -246,13 +250,16 @@ function App() {
       <h2>
         <AccordionButton>
           <Box flex='1' textAlign='left'>
-            { deposit.canBeUnlocked()
-              ? <UnlockIcon mr={4} />
-              : <TimeIcon mr={4} />
+            { deposit.isAlreadyWithdrawn()
+              ? <CheckIcon mr={4} />
+              : deposit.canBeUnlocked() ? <UnlockIcon mr={4}/> : <TimeIcon mr={4} />
             }
 
             {`Deposit ${deposit.id + 1}: `}
-            <b>{`${ethers.utils.formatEther(deposit.amount)} ETH`}</b>
+            { deposit.isAlreadyWithdrawn()
+              ? <b>Deposit withdrawn</b>
+              : <b>{`${ethers.utils.formatEther(deposit.amount)} ETH`}</b>
+            }
           </Box>
           <AccordionIcon />
         </AccordionButton>
